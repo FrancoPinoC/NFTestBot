@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from discord.ext import commands
 import traceback
 import sys
@@ -26,11 +25,13 @@ async def hello(context, member: discord.Member = None):
     botname = NFTestBot.user.name
     return await NFTestBot.say("YO " + member.mention + "!!")
 
+
 @NFTestBot.command(pass_context=True)
 async def waluigi(ctx):
     # Just a test. This method will PM whoever used this command
     return await NFTestBot.send_message(ctx.message.author,
-                                 "Hey, " + ctx.message.author.name + " http://i.imgur.com/GfR30jl.gif")
+                                        "Hey, " + ctx.message.author.name + " http://i.imgur.com/GfR30jl.gif")
+
 
 # This method triggers when the event of a member joining occurs.
 @NFTestBot.event
@@ -39,12 +40,11 @@ async def on_member_join(member):
     server = member.server
     # Finds a channel so that we can link to it in our welcome message
     useful_channel = discord.utils.get(server.channels, name='rules_and_information')
-    welcome = "Hey, {0.mention}! Welcome to {1.name}!" \
-              "I am {2.user.name} an automated bot. You can see a list of my commands by messaging me '!help'" \
-              "(just click on my name from the members list and send me that message).\n"\
-              "First, you should go to {3.mention} for general directions (just click that name!)" \
-              "Other than that, the green peeps over there in the members list are the admin team, " \
-              "they, and really everyone else, can help you with anything you need. Have fun and DFTBA!"
+    welcome = "Hey, {0.mention}! Welcome to {1.name}!\n" \
+              "I am {2.user.name} an automated :robot:. You can see a list of my commands by messaging me '!help' " \
+              "(without the quotes. Just click on my name from the members list and send me that message).\n\n"\
+              "Please go here {3.mention} for general directions.\n" \
+              "Don't be afraid to ask the meatbags anything! Have fun and DFTBA!"
     return await NFTestBot.send_message(server, welcome.format(member, server, NFTestBot, useful_channel))
 
 
@@ -54,16 +54,16 @@ async def kill_bot(ctx, member: discord.Member = None):
     if member is None:
         member = ctx.message.author
     if not member.server_permissions.administrator:
-        await NFTestBot.say("Lol. You need to evolve into an admin if you want to take me on pal Q('-'Q).")
+        return await NFTestBot.say("Lol. You need to evolve into an admin if you want to take me on pal Q('-'Q).")
     await NFTestBot.say("That's not even nice, but ok...")
     return await NFTestBot.logout()
+
 
 @NFTestBot.command(pass_context=True, aliases=["memberCount", "countMembers", "count_members"])
 async def member_count(ctx):
     server = ctx.message.server
     count = server.member_count
     return await NFTestBot.say("There are {} members in this server.".format(count))
-
 
 
 @NFTestBot.event
@@ -73,10 +73,10 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.CommandInvokeError):
         print('In {0.command.qualified_name}:'.format(ctx), file=sys.stderr)
         traceback.print_tb(error.original.__traceback__)
+        print('{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
     elif isinstance(error, commands.BadArgument):
         return await NFTestBot.send_message(ctx.message.channel, 'Whoa, something was wrong with '
                                                                  'the arguments you passed there')
-    print('{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
     return
 
 
