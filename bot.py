@@ -5,9 +5,11 @@ import sys
 import secrets
 import hinter
 from discord.ext.commands import Bot
+import config
 
 # Means you will call commands by writing "!<name of command>" in Discord
 NFTestBot = Bot(command_prefix="!")
+passwords = config.Config('passwords.json')
 
 # Stuff that happens when you turn this mofo on. (Print goes to the console you start this from, not a Discord chat)
 @NFTestBot.event
@@ -22,7 +24,6 @@ async def hello(context, member: discord.Member = None):
     # I don't know why you need to make member default to None, but you do.
     if member is None:
         member = context.message.author
-    botname = NFTestBot.user.name
     return await NFTestBot.say("YO " + member.mention + "!!")
 
 
@@ -78,6 +79,35 @@ async def on_command_error(error, ctx):
         return await NFTestBot.send_message(ctx.message.channel, 'Whoa, something was wrong with '
                                                                  'the arguments you passed there')
     return
+
+#Experimental command. Ask the bot to let you become role_name if you give it the right password.
+@NFTestBot.command(pass_context=True)
+async def role_it(ctx, role_name):
+    member = ctx.message.author
+    # role_name needs to be a role of lesser hierarchy than the bot's role. Just give the bot admin power and make the
+    # role not be an admin role and it should work (admins can still use this command)
+    role = discord.utils.find(lambda r: r.name == role_name, ctx.message.server.roles)
+    # passwords it's just a json with this kinda content (this command will raise an error if the json doesn't exist)
+    # {"week0":"pass1","week1":"pass2"}
+    global passwords
+    # I don't know why I don't have to call "passwords.all()" here and instead can do this directly.
+    password = passwords["week0"]
+    await NFTestBot.say('Send me a private message with the password and I will let you in if it\'s correct.\n'
+                        '**You can say "cancel" without quotes to stop me from asking.**')
+    def check(m):
+        return m.author.id == member.id and \
+               m.channel.is_private
+    reply = await NFTestBot.wait_for_message(check=check, timeout=1500.0)
+    if reply is None:
+        return await NFTestBot.say("Time's up, {0.mention}. You gotta call the command again to try again".format(member))
+    if reply.content.strip() != password:
+        return await NFTestBot.send_message(member, "That's not the password.\n"
+                                                    "http://www.icge.co.uk/languagesciencesblog/wp-content/uploads/2014"
+                                                    "/04/you_shall_not_pass1.jpg")
+    else:
+        await NFTestBot.send_message(member, "Well done")
+    await NFTestBot.add_roles(member, role)
+    return await NFTestBot.say("{0.mention} evolved into {1.name}!".format(member, role))
 
 
 # You can add commands from another class this way:
