@@ -92,8 +92,7 @@ async def role_it(ctx, role_name):
     global passwords
     # I don't know why I don't have to call "passwords.all()" here and instead can do this directly.
     password = passwords["week0"]
-    await NFTestBot.say('Send me a private message with the password and I will let you in if it\'s correct.\n'
-                        '**You can say "cancel" without quotes to stop me from asking.**')
+    await NFTestBot.say('Send me a private message with the password and I will let you in if it\'s correct.\n')
     def check(m):
         return m.author.id == member.id and \
                m.channel.is_private
