@@ -9,7 +9,7 @@ class Hinter:
         self.config = config.Config('hints.json')
         self.bot = bot
 
-    # Use "commands" to later add this commands to a bot (in this case self.bot) as part of a cog. See bot.py for more.
+    # Use "commands" to later add this command to a bot (in this case self.bot) as part of a cog. See bot.py for more.
     @commands.command(aliases=["addHint", "AddHint"],
                       description="Add a hint. First argument is the name or topic you are going to use to later "
                                   "retrieve the hint, the second argument is the hint itself. Surround with quotes if "
@@ -27,9 +27,7 @@ class Hinter:
             return await self.bot.say("There's already a hint for {0}! It's this:\n"
                                       "```\n{1}\n```".format(hint_name, hint))
 
-    @commands.command(aliases=["delHint", "DelHint"], description="Give me a topic or hint name and I will give you"
-                                                                  "a hint for it. If the name is more than one word"
-                                                                  "long, surround it with \"quotation marks\"")
+    @commands.command(aliases=["delHint", "DelHint"], description="Delete the hint for the chosen topic.")
     async def del_hint(self, hint_name):
         try:
             await self.config.remove(hint_name)
@@ -39,7 +37,9 @@ class Hinter:
         else:
             return await self.bot.say(hint_name + " has been removed from the hints list.")
 
-    @commands.command(aliases=["hintPls"])
+    @commands.command(aliases=["hintPls"], description="Give me a topic or hint name and I will give you"
+                                                       "a hint for it. If the name is more than one word"
+                                                       "long, surround it with \"quotation marks\"")
     async def hint_pls(self, hint_name):
         hints = self.config.all()
         try:
