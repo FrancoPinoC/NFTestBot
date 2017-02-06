@@ -80,6 +80,15 @@ async def on_command_error(error, ctx):
                                                                  'the arguments you passed there')
     return
 
+
+@NFTestBot.command(aliases=["aBunny", "ABunny", "A_Bunny"])
+async def a_bunny():
+    bunny = ":\n" \
+            "(\\\\(\\ \n" \
+            "( - -)\n" \
+            "((') (')"
+    return await NFTestBot.say(bunny)
+
 #Experimental command. Ask the bot to let you become role_name if you give it the right password.
 @NFTestBot.command(pass_context=True)
 async def role_it(ctx, role_name):
@@ -92,7 +101,10 @@ async def role_it(ctx, role_name):
     global passwords
     # I don't know why I don't have to call "passwords.all()" here and instead can do this directly.
     password = passwords["week0"]
-    await NFTestBot.say('Send me a private message with the password and I will let you in if it\'s correct.\n')
+    # Delete message so as to not clog with the chat with messages of people attempting to get the pass right.
+    await NFTestBot.delete_message(ctx.message)
+    await NFTestBot.send_message(member, 'Respond here with the password and I will let you in if it\'s correct.\n')
+
     def check(m):
         return m.author.id == member.id and \
                m.channel.is_private
